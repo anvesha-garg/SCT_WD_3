@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Geography & Capitals Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1B5E20;  /* Deep green background */
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #81C784;  /* Light green star color */
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        .quiz-container {
+            width: 700px;
+            background: rgba(27, 94, 32, 0.9);  /* Green background */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px #2E7D32, 0 0 15px rgba(46, 125, 50, 0.5) inset;
+            border: 2px solid #388E3C;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(46, 125, 50, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #E8F5E9;  /* Light green text */
+            text-shadow: 0 0 10px #2E7D32, 0 0 20px #388E3C;
+            position: relative;
+            letter-spacing: 2px;
+            animation: colorshift 6s linear infinite;
+        }
+
+        @keyframes colorshift {
+            0% { color: #A5D6A7; }
+            50% { color: #E8F5E9; }
+            100% { color: #A5D6A7; }
+        }
+
+        .question {
+            background: rgba(27, 94, 32, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #388E3C;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question p {
+            color: #E8F5E9;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .btn {
+            height: 55px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+            background: rgba(27, 94, 32, 0.8);
+            color: #E8F5E9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid #388E3C;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(232, 245, 233, 0.8);
+            opacity: 0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+            transition: 0s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+            background: rgba(27, 94, 32, 0.9);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        .correct-message {
+            background-color: rgba(76, 175, 80, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .incorrect-message {
+            background-color: rgba(244, 67, 54, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(27, 94, 32, 0.9);
+            color: #E8F5E9;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            z-index: 1000;
+        }
+
+        .btn.selected-correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn.selected-incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+
+        /* Score Card Styles */
+        .score-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .score-card.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .score-card-content {
+            width: 80%;
+            max-width: 600px;
+            background: rgba(27, 94, 32, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px #2E7D32;
+            border: 2px solid #388E3C;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .score-title {
+            font-size: 2.5rem;
+            color: #E8F5E9;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #2E7D32;
+        }
+
+        .score-result {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #E8F5E9;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #A5D6A7;
+        }
+
+        .score-message {
+            font-size: 1.5rem;
+            color: #E8F5E9;
+            margin-bottom: 30px;
+        }
+
+        .score-progress {
+            height: 30px;
+            background: rgba(56, 142, 60, 0.5);
+            border-radius: 15px;
+            margin: 20px 0 30px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: linear-gradient(to right, #A5D6A7, #E8F5E9);
+            border-radius: 15px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #388E3C;
+            color: #E8F5E9;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .restart-btn:hover {
+            background: #2E7D32;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .restart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f55;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="score-display">Score: <span id="score">0</span> / 20</div>
+    <div class="stars"></div>
+    <div class="quiz-container">
+        <h1>India Geography & Capitals Quiz</h1>
+        <div id="quiz">
+            <div class="question">
+                <p>1. What is the capital of Rajasthan?</p>
+                <div class="options">
+                    <button class="btn">Udaipur</button>
+                    <button class="btn" data-correct="true">Jaipur</button>
+                    <button class="btn">Jodhpur</button>
+                    <button class="btn">Ajmer</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. Which is the largest state in India by area?</p>
+                <div class="options">
+                    <button class="btn">Maharashtra</button>
+                    <button class="btn">Madhya Pradesh</button>
+                    <button class="btn" data-correct="true">Rajasthan</button>
+                    <button class="btn">Uttar Pradesh</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. What is the capital of Assam?</p>
+                <div class="options">
+                    <button class="btn">Guwahati</button>
+                    <button class="btn" data-correct="true">Dispur</button>
+                    <button class="btn">Jorhat</button>
+                    <button class="btn">Silchar</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>4. Which river is the longest in India?</p>
+                <div class="options">
+                    <button class="btn">Yamuna</button>
+                    <button class="btn" data-correct="true">Ganges</button>
+                    <button class="btn">Brahmaputra</button>
+                    <button class="btn">Godavari</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>5. What is the capital of Telangana?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Hyderabad</button>
+                    <button class="btn">Warangal</button>
+                    <button class="btn">Nizamabad</button>
+                    <button class="btn">Secunderabad</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>6. Which mountain range runs along the western coast of India?</p>
+                <div class="options">
+                    <button class="btn">Himalayas</button>
+                    <button class="btn" data-correct="true">Western Ghats</button>
+                    <button class="btn">Eastern Ghats</button>
+                    <button class="btn">Aravalli Range</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>7. What is the capital of Kerala?</p>
+                <div class="options">
+                    <button class="btn">Kochi</button>
+                    <button class="btn" data-correct="true">Thiruvananthapuram</button>
+                    <button class="btn">Kozhikode</button>
+                    <button class="btn">Thrissur</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>8. Which is the smallest state in India by area?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Goa</button>
+                    <button class="btn">Sikkim</button>
+                    <button class="btn">Kerala</button>
+                    <button class="btn">Manipur</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>9. What is the capital of Gujarat?</p>
+                <div class="options">
+                    <button class="btn">Surat</button>
+                    <button class="btn" data-correct="true">Gandhinagar</button>
+                    <button class="btn">Ahmedabad</button>
+                    <button class="btn">Vadodara</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>10. Which is the northernmost state of India?</p>
+                <div class="options">
+                    <button class="btn">Himachal Pradesh</button>
+                    <button class="btn" data-correct="true">Jammu and Kashmir</button>
+                    <button class="btn">Uttarakhand</button>
+                    <button class="btn">Sikkim</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>11. What is the capital of Karnataka?</p>
+                <div class="options">
+                    <button class="btn">Mysore</button>
+                    <button class="btn" data-correct="true">Bangalore</button>
+                    <button class="btn">Hubli</button>
+                    <button class="btn">Mangalore</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>12. Which desert is located in Rajasthan?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Thar Desert</button>
+                    <button class="btn">Gobi Desert</button>
+                    <button class="btn">Atacama Desert</button>
+                    <button class="btn">Arabian Desert</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>13. What is the capital of Maharashtra?</p>
+                <div class="options">
+                    <button class="btn">Nagpur</button>
+                    <button class="btn">Pune</button>
+                    <button class="btn" data-correct="true">Mumbai</button>
+                    <button class="btn">Nashik</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>14. Which is the highest mountain peak in India?</p>
+                <div class="options">
+                    <button class="btn">K2</button>
+                    <button class="btn" data-correct="true">Kanchenjunga</button>
+                    <button class="btn">Mount Everest</button>
+                    <button class="btn">Nanda Devi</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>15. What is the capital of Odisha?</p>
+                <div class="options">
+                    <button class="btn">Cuttack</button>
+                    <button class="btn" data-correct="true">Bhubaneswar</button>
+                    <button class="btn">Puri</button>
+                    <button class="btn">Berhampur</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>16. Which river delta is located in West Bengal?</p>
+                <div class="options">
+                    <button class="btn">Krishna Delta</button>
+                    <button class="btn">Godavari Delta</button>
+                    <button class="btn" data-correct="true">Sundarbans Delta</button>
+                    <button class="btn">Mahanadi Delta</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>17. What is the capital of Madhya Pradesh?</p>
+                <div class="options">
+                    <button class="btn">Indore</button>
+                    <button class="btn" data-correct="true">Bhopal</button>
+                    <button class="btn">Jabalpur</button>
+                    <button class="btn">Gwalior</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>18. Which is the southernmost point of mainland India?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Kanyakumari</button>
+                    <button class="btn">Rameshwaram</button>
+                    <button class="btn">Cape Comorin</button>
+                    <button class="btn">Trivandrum</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>19. What is the capital of Punjab?</p>
+                <div class="options">
+                    <button class="btn">Ludhiana</button>
+                    <button class="btn" data-correct="true">Chandigarh</button>
+                    <button class="btn">Amritsar</button>
+                    <button class="btn">Jalandhar</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>20. Which is the longest river bridge in India?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Mahatma Gandhi Setu</button>
+                    <button class="btn">Bandra-Worli Sea Link</button>
+                    <button class="btn">Bogibeel Bridge</button>
+                    <button class="btn">Chenab Bridge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Card -->
+    <div class="score-card" id="scoreCard">
+        <div class="score-card-content">
+            <h2 class="score-title">Quiz Completed!</h2>
+            <div class="score-result" id="finalScore">0/20</div>
+            <div class="score-message" id="scoreMessage">Let's see how you did...</div>
+            <div class="score-progress">
+                <div class="score-bar" id="scoreBar" style="width: 0%"></div>
+            </div>
+            <button class="restart-btn" id="restartBtn">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Star background generation
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numStars = 100;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${Math.random() * 2}px`;
+                star.style.height = star.style.width;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Quiz Interaction
+        let score = 0;
+        let answeredQuestions = 0;
+        const totalQuestions = 20;
+        const questions = document.querySelectorAll('.question');
+
+        // Check if the quiz is complete and show the score card
+        function checkQuizCompletion() {
+            if (answeredQuestions === totalQuestions) {
+                setTimeout(showScoreCard, 1000);
+            }
+        }
+
+        // Create confetti effect for score card
+        function createConfetti() {
+            const confettiContainer = document.querySelector('.score-card');
+            const colors = ['#4CAF50', '#A5D6A7', '#E8F5E9', '#388E3C', '#81C784'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        // Show score card with final results
+        function showScoreCard() {
+            const scoreCard = document.getElementById('scoreCard');
+            const finalScore = document.getElementById('finalScore');
+            const scoreMessage = document.getElementById('scoreMessage');
+            const scoreBar = document.getElementById('scoreBar');
+            
+            finalScore.textContent = `${score}/${totalQuestions}`;
+            
+            // Calculate percentage
+            const percentage = (score / totalQuestions) * 100;
+            
+            // Set score bar width based on percentage
+            setTimeout(() => {
+                scoreBar.style.width = `${percentage}%`;
+            }, 500);
+            
+            // Set message based on score
+            if (percentage >= 90) {
+                scoreMessage.textContent = "Outstanding! You have impressive knowledge of Indian geography!";
+            } else if (percentage >= 75) {
+                scoreMessage.textContent = "Great job! You know India's geography very well!";
+            } else if (percentage >= 60) {
+                scoreMessage.textContent = "Good effort! You have solid knowledge about Indian geography.";
+            } else if (percentage >= 40) {
+                scoreMessage.textContent = "Not bad! You have some knowledge about Indian geography.";
+            } else {
+                scoreMessage.textContent = "Keep learning! There's more to discover about India's geography.";
+            }
+            
+            // Show the score card
+            scoreCard.classList.add('show');
+            
+            // Add confetti effect for good scores
+            if (percentage >= 60) {
+                createConfetti();
+            }
+        }
+
+        // Quiz interaction
+        questions.forEach(question => {
+            const buttons = question.querySelectorAll('.btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Prevent interaction if already answered
+                    if (question.classList.contains('answered')) {
+                        return;
+                    }
+                    
+                    // Mark question as answered
+                    question.classList.add('answered');
+                    answeredQuestions++;
+                    
+                    // Disable further clicks on this question's buttons
+                    buttons.forEach(btn => btn.disabled = true);
+
+                    // Check if the selected answer is correct
+                    if (this.hasAttribute('data-correct')) {
+                        // Correct answer
+                        this.classList.add('selected-correct');
+                        score++;
+                        
+                        // Create and display correct message
+                        const correctMessage = document.createElement('div');
+                        correctMessage.classList.add('correct-message');
+                        correctMessage.textContent = "Correct! Well done! 🎉";
+                        question.appendChild(correctMessage);
+
+                        // Update score display
+                        document.getElementById('score').textContent = score;
+                    } else {
+                        // Incorrect answer
+                        this.classList.add('selected-incorrect');
+                        
+                        // Find and highlight the correct answer
+                        const correctButton = Array.from(buttons).find(btn => btn.hasAttribute('data-correct'));
+                        if (correctButton) {
+                            correctButton.classList.add('selected-correct');
+                        }
+
+                        // Create and display incorrect message
+                        const incorrectMessage = document.createElement('div');
+                        incorrectMessage.classList.add('incorrect-message');
+                        incorrectMessage.textContent = "Oops! That's not correct. 😕";
+                        question.appendChild(incorrectMessage);
+                    }
+                    
+                    // Check if the quiz is complete
+                    checkQuizCompletion();
+                });
+            });
+        });
+
+        // Restart the quiz
+        document.getElementById('restartBtn').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+</body>
+</html>

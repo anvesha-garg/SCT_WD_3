@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming and E-Sports Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000000;  /* Black background */
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #FFFFFF;  /* White star color */
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        .quiz-container {
+            width: 700px;
+            background: rgba(0, 0, 0, 0.9);  /* Black background */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px #333333, 0 0 15px rgba(51, 51, 51, 0.5) inset;
+            border: 2px solid #222222;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(34, 34, 34, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #FFFFFF;  /* White text */
+            text-shadow: 0 0 10px #666666, 0 0 20px #444444;
+            position: relative;
+            letter-spacing: 2px;
+            animation: colorshift 6s linear infinite;
+        }
+
+        @keyframes colorshift {
+            0% { color: #AAAAAA; }
+            50% { color: #FFFFFF; }
+            100% { color: #AAAAAA; }
+        }
+
+        .question {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #222222;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question p {
+            color: #FFFFFF;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .btn {
+            height: 55px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+            background: rgba(0, 0, 0, 0.8);
+            color: #FFFFFF;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid #222222;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+            transition: 0s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        .correct-message {
+            background-color: rgba(76, 175, 80, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .incorrect-message {
+            background-color: rgba(244, 67, 54, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #FFFFFF;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            z-index: 1000;
+        }
+
+        .btn.selected-correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn.selected-incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+
+        /* Score Card Styles */
+        .score-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .score-card.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .score-card-content {
+            width: 80%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px #333333;
+            border: 2px solid #222222;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .score-title {
+            font-size: 2.5rem;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #666666;
+        }
+
+        .score-result {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #AAAAAA;
+        }
+
+        .score-message {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 30px;
+        }
+
+        .score-progress {
+            height: 30px;
+            background: rgba(34, 34, 34, 0.5);
+            border-radius: 15px;
+            margin: 20px 0 30px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: linear-gradient(to right, #AAAAAA, #FFFFFF);
+            border-radius: 15px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #222222;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .restart-btn:hover {
+            background: #111111;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .restart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f55;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="score-display">Score: <span id="score">0</span> / 20</div>
+    <div class="stars"></div>
+    <div class="quiz-container">
+        <h1>Gaming and E-Sports in India Quiz</h1>
+        <div id="quiz">
+            <div class="question">
+                <p>1. Which city is considered the hub of gaming in India?</p>
+                <div class="options">
+                    <button class="btn">Mumbai</button>
+                    <button class="btn" data-correct="true">Bangalore</button>
+                    <button class="btn">Hyderabad</button>
+                    <button class="btn">Pune</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. Which game has the largest competitive gaming community in India?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">PUBG Mobile</button>
+                    <button class="btn">Call of Duty</button>
+                    <button class="btn">Valorant</button>
+                    <button class="btn">Dota 2</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. Who is considered the most popular Indian gaming content creator?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Carry Minati</button>
+                    <button class="btn">Mortal</button>
+                    <button class="btn">Scout</button>
+                    <button class="btn">Dynamo</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>4. In which year did India officially recognize E-Sports?</p>
+                <div class="options">
+                    <button class="btn">2020</button>
+                    <button class="btn">2021</button>
+                    <button class="btn" data-correct="true">2022</button>
+                    <button class="btn">2019</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>5. Which Indian team won significant recognition in PUBG Mobile tournaments?</p>
+                <div class="options">
+                    <button class="btn">Godlike</button>
+                    <button class="btn">Entity Gaming</button>
+                    <button class="btn">TSM</button>
+                    <button class="btn" data-correct="true">Team Soul</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>6. What percentage of India's gaming population is under 25 years old?</p>
+                <div class="options">
+                    <button class="btn">75%</button>
+                    <button class="btn" data-correct="true">80%</button>
+                    <button class="btn">85%</button>
+                    <button class="btn">90%</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>7. Which platform is most popular for gaming content in India?</p>
+                <div class="options">
+                    <button class="btn">Twitch</button>
+                    <button class="btn" data-correct="true">YouTube Gaming</button>
+                    <button class="btn">Facebook Gaming</button>
+                    <button class="btn">Instagram Live</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>8. Who is known as the first professional Indian DOTA 2 player?</p>
+                <div class="options">
+                    <button class="btn">Mortal</button>
+                    <button class="btn" data-correct="true">Arif Khan</button>
+                    <button class="btn">Scout</button>
+                    <button class="btn">Dynamo</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>9. What is the estimated value of India's gaming market in 2023?</p>
+                <div class="options">
+                    <button class="btn">$1.5 billion</button>
+                    <button class="btn">$2 billion</button>
+                    <button class="btn" data-correct="true">$2.6 billion</button>
+                    <button class="btn">$3 billion</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>10. Which gaming genre is most popular among Indian gamers?</p>
+                <div class="options">
+                    <button class="btn">First-Person Shooter</button>
+                    <button class="btn" data-correct="true">Battle Royale</button>
+                    <button class="btn">Role-Playing Games</button>
+                    <button class="btn">Strategy Games</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>11. Which international gaming tournament has seen significant Indian participation?</p>
+                <div class="options">
+                    <button class="btn">The International</button>
+                    <button class="btn">ESL One</button>
+                    <button class="btn">World Electronic Sports Games</button>
+                    <button class="btn" data-correct="true">PMGC</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>12. What is the average age of professional gamers in India?</p>
+                <div class="options">
+                    <button class="btn">18-20 years</button>
+                    <button class="btn" data-correct="true">22-25 years</button>
+                    <button class="btn">26-30 years</button>
+                    <button class="btn">30-35 years</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>13. Which company has invested heavily in E-Sports infrastructure in India?</p>
+                <div class="options">
+                    <button class="btn">Reliance</button>
+                    <button class="btn" data-correct="true">Nazara Technologies</button>
+                    <button class="btn">Tencent</button>
+                    <button class="btn">Paytm</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>14. What percentage of India's internet users are gamers?</p>
+                <div class="options">
+                    <button class="btn">30%</button>
+                    <button class="btn">40%</button>
+                    <button class="btn" data-correct="true">50%</button>
+                    <button class="btn">60%</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>15. Which mobile game dominated the Indian gaming scene in 2020-2021?</p>
+                <div class="options">
+                    <button class="btn">Free Fire</button>
+                    <button class="btn" data-correct="true">PUBG Mobile</button>
+                    <button class="btn">Call of Duty Mobile</button>
+                    <button class="btn">Clash of Clans</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>16. Who was the first Indian to win an international E-Sports tournament?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Mortal</button>
+                    <button class="btn">Scout</button>
+                    <button class="btn">Dynamo</button>
+                    <button class="btn">Carry Minati</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>17. Which international game developer has a significant office in India?</p>
+                <div class="options">
+                    <button class="btn">Valve</button>
+                    <button class="btn" data-correct="true">Ubisoft</button>
+                    <button class="btn">Electronic Arts</button>
+                    <button class="btn">Blizzard</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>18. What is the primary streaming platform for Indian gamers?</p>
+                <div class="options">
+                    <button class="btn">Twitch</button>
+                    <button class="btn" data-correct="true">YouTube Gaming</button>
+                    <button class="btn">Facebook Gaming</button>
+                    <button class="btn">Instagram Live</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>19. Which E-Sports scholarship program was first introduced in India?</p>
+                <div class="options">
+                    <button class="btn">FICCI Scholarship</button>
+                    <button class="btn" data-correct="true">Nodwin Gaming Scholarship</button>
+                    <button class="btn">NASSCOM Scholarship</button>
+                    <button class="btn">Gaming Nation Scholarship</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>20. Which game is most popular for professional tournaments in India?</p>
+                <div class="options">
+                    <button class="btn">Counter-Strike</button>
+                    <button class="btn">DOTA 2</button>
+                    <button class="btn" data-correct="true">PUBG Mobile</button>
+                    <button class="btn">Valorant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Card -->
+    <div class="score-card" id="scoreCard">
+        <div class="score-card-content">
+            <h2 class="score-title">Quiz Completed!</h2>
+            <div class="score-result" id="finalScore">0/20</div>
+            <div class="score-message" id="scoreMessage">Let's see how you did...</div>
+            <div class="score-progress">
+                <div class="score-bar" id="scoreBar" style="width: 0%"></div>
+            </div>
+            <button class="restart-btn" id="restartBtn">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Star background generation
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numStars = 100;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${Math.random() * 2}px`;
+                star.style.height = star.style.width;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Quiz Interaction
+        let score = 0;
+        let answeredQuestions = 0;
+        const totalQuestions = 20;
+        const questions = document.querySelectorAll('.question');
+
+        // Check if the quiz is complete and show the score card
+        function checkQuizCompletion() {
+            if (answeredQuestions === totalQuestions) {
+                setTimeout(showScoreCard, 1000);
+            }
+        }
+
+        // Create confetti effect for score card
+        function createConfetti() {
+            const confettiContainer = document.querySelector('.score-card');
+            const colors = ['#00FFFF', '#AAAAAA', '#FFFFFF', '#222222', '#444444'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        // Show score card with final results
+        function showScoreCard() {
+            const scoreCard = document.getElementById('scoreCard');
+            const finalScore = document.getElementById('finalScore');
+            const scoreMessage = document.getElementById('scoreMessage');
+            const scoreBar = document.getElementById('scoreBar');
+            
+            finalScore.textContent = `${score}/${totalQuestions}`;
+            
+            // Calculate percentage
+            const percentage = (score / totalQuestions) * 100;
+            
+            // Set score bar width based on percentage
+            setTimeout(() => {
+                scoreBar.style.width = `${percentage}%`;
+            }, 500);
+            
+            // Set message based on score
+            if (percentage >= 90) {
+                scoreMessage.textContent = "Outstanding! You're a gaming and esports expert!";
+            } else if (percentage >= 75) {
+                scoreMessage.textContent = "Great job! You know the Indian gaming scene very well!";
+            } else if (percentage >= 60) {
+                scoreMessage.textContent = "Good effort! You have solid knowledge about gaming in India.";
+            } else if (percentage >= 40) {
+                scoreMessage.textContent = "Not bad! You have some knowledge about Indian gaming.";
+            } else {
+                scoreMessage.textContent = "Keep learning! There's more to discover about gaming in India.";
+            }
+            
+            // Show the score card
+            scoreCard.classList.add('show');
+            
+            // Add confetti effect for good scores
+            if (percentage >= 60) {
+                createConfetti();
+            }
+        }
+
+        // Quiz interaction
+        questions.forEach(question => {
+            const buttons = question.querySelectorAll('.btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Prevent interaction if already answered
+                    if (question.classList.contains('answered')) {
+                        return;
+                    }
+                    
+                    // Mark question as answered
+                    question.classList.add('answered');
+                    answeredQuestions++;
+                    
+                    // Disable further clicks on this question's buttons
+                    buttons.forEach(btn => btn.disabled = true);
+
+                    // Check if the selected answer is correct
+                    if (this.hasAttribute('data-correct')) {
+                        // Correct answer
+                        this.classList.add('selected-correct');
+                        score++;
+                        
+                        // Create and display correct message
+                        const correctMessage = document.createElement('div');
+                        correctMessage.classList.add('correct-message');
+                        correctMessage.textContent = "Correct! Well done! 🎉";
+                        question.appendChild(correctMessage);
+
+                        // Update score display
+                        document.getElementById('score').textContent = score;
+                    } else {
+                        // Incorrect answer
+                        this.classList.add('selected-incorrect');
+                        
+                        // Find and highlight the correct answer
+                        const correctButton = Array.from(buttons).find(btn => btn.hasAttribute('data-correct'));
+                        if (correctButton) {
+                            correctButton.classList.add('selected-correct');
+                        }
+
+                        // Create and display incorrect message
+                        const incorrectMessage = document.createElement('div');
+                        incorrectMessage.classList.add('incorrect-message');
+                        incorrectMessage.textContent = "Oops! That's not correct. 😕";
+                        question.appendChild(incorrectMessage);
+                    }
+                    
+                    // Check if the quiz is complete
+                    checkQuizCompletion();
+                });
+            });
+        });
+
+        // Restart the quiz
+        document.getElementById('restartBtn').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+</body>
+</html>

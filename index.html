@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QGenie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9aa2, #ffb7b2, #ffdac1, #e2f0cb, #b5ead7, #c7ceea);
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .quiz-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.2), 
+                0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-container:hover {
+            box-shadow: 
+                0 20px 45px rgba(0,0,0,0.25), 
+                0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .main-title {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .main-title h1 {
+            font-size: 4rem;
+            color: transparent;
+            background: linear-gradient(45deg, #6a5acd, #8a2be2, #ff69b4, #ff3f80);
+            background-size: 300% 300%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+            font-weight: 800;
+            animation: gradient-animation 8s ease infinite, float 3s ease-in-out infinite;
+        }
+
+        .main-title span {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(106, 90, 205, 0.8), transparent);
+            border-radius: 10px;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .main-title::before,
+        .main-title::after {
+            content: '✧';
+            font-size: 2rem;
+            color: rgba(106, 90, 205, 0.8);
+            position: absolute;
+            top: 50%;
+            animation: sparkle 1.5s ease-in-out infinite alternate;
+        }
+
+        .main-title::before {
+            left: 18%;
+        }
+
+        .main-title::after {
+            right: 18%;
+        }
+
+        @keyframes sparkle {
+            0% { transform: translateY(-50%) scale(1); opacity: 0.7; }
+            100% { transform: translateY(-50%) scale(1.3); opacity: 1; }
+        }
+
+        #topic-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .topic-btn {
+            display: none; /* Hide the buttons */
+        }
+
+        .switch-container {
+            width: 100%;
+            position: relative;
+            height: 50px;
+            margin-bottom: 5px;
+        }
+
+        .switch-label {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.5);
+            color: #555;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .switch-label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+            transition: 0.5s;
+        }
+
+        .switch-container:nth-child(1) .switch-label { background-color: rgba(255, 154, 162, 0.6); }
+        .switch-container:nth-child(2) .switch-label { background-color: rgba(255, 183, 178, 0.6); }
+        .switch-container:nth-child(3) .switch-label { background-color: rgba(255, 218, 193, 0.6); }
+        .switch-container:nth-child(4) .switch-label { background-color: rgba(226, 240, 203, 0.6); }
+        .switch-container:nth-child(5) .switch-label { background-color: rgba(181, 234, 215, 0.6); }
+        .switch-container:nth-child(6) .switch-label { background-color: rgba(199, 206, 234, 0.6); }
+        .switch-container:nth-child(7) .switch-label { background-color: rgba(174, 198, 255, 0.6); }
+        .switch-container:nth-child(8) .switch-label { background-color: rgba(184, 184, 255, 0.6); }
+        .switch-container:nth-child(9) .switch-label { background-color: rgba(193, 168, 226, 0.6); }
+        .switch-container:nth-child(10) .switch-label { background-color: rgba(214, 153, 204, 0.6); }
+
+        .switch-label:hover::before {
+            left: 100%;
+        }
+
+        .switch-label .slider {
+            position: absolute;
+            right: 10px;
+            width: 50px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 34px;
+            transition: all 0.4s ease;
+        }
+
+        .switch-label .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.4s ease;
+        }
+
+        .topic-btn:checked + .switch-label {
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .topic-btn:checked + .switch-label .slider {
+            background-color: rgba(106, 90, 205, 0.8);
+        }
+
+        .topic-btn:checked + .switch-label .slider:before {
+            transform: translateX(26px);
+        }
+
+        .topic-btn:focus + .switch-label {
+            box-shadow: 0 0 2px #2196F3;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            #topic-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title h1 {
+                font-size: 3rem;
+            }
+            
+            .main-title::before {
+                left: 10%;
+            }
+
+            .main-title::after {
+                right: 10%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="quiz-container">
+        <div class="main-title">
+            <h1>QGenie</h1>
+            <span></span>
+        </div>
+        <div id="topic-container">
+            <div class="switch-container">
+                <input type="checkbox" id="gk" class="topic-btn">
+                <label for="gk" class="switch-label">
+                    General Knowledge
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="scinspace" class="topic-btn">
+                <label for="scinspace" class="switch-label">
+                    Science & Space
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="history" class="topic-btn">
+                <label for="history" class="switch-label">
+                    History & World Events
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="geo" class="topic-btn">
+                <label for="geo" class="switch-label">
+                    Geography and Capitals
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="maths" class="topic-btn">
+                <label for="maths" class="switch-label">
+                    Mathematics & Logic
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="programming" class="topic-btn">
+                <label for="programming" class="switch-label">
+                    Programming
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="movie" class="topic-btn">
+                <label for="movie" class="switch-label">
+                    Movies and Media
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="esports" class="topic-btn">
+                <label for="esports" class="switch-label">
+                    Gaming and E-Sports
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="mythology" class="topic-btn">
+                <label for="mythology" class="switch-label">
+                    Mythology & Folklore
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-container">
+                <input type="checkbox" id="sports" class="topic-btn">
+                <label for="sports" class="switch-label">
+                    Sports
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Star creation function
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numStars = 150;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+        
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${Math.random() * 2}px`;
+                star.style.height = star.style.width;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Handle switch clicks to navigate to the respective pages
+        const switches = document.querySelectorAll('.topic-btn');
+        switches.forEach(switchEl => {
+            switchEl.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    setTimeout(() => {
+                        window.location.href = `${e.target.id}.html`;
+                    }, 300); // Delay for animation effect
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies and Media Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #300030;  /* Dark magenta background */
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #FFB6C1;  /* Light pink star color */
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        .quiz-container {
+            width: 700px;
+            background: rgba(48, 0, 48, 0.9);  /* Dark magenta background */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px #FF1493, 0 0 15px rgba(255, 20, 147, 0.5) inset;
+            border: 2px solid #FF1493;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 20, 147, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #FFB6C1;  /* Light pink text */
+            text-shadow: 0 0 10px #FF1493, 0 0 20px #FF69B4;
+            position: relative;
+            letter-spacing: 2px;
+            animation: colorshift 6s linear infinite;
+        }
+
+        @keyframes colorshift {
+            0% { color: #FF69B4; }
+            50% { color: #FFB6C1; }
+            100% { color: #FF69B4; }
+        }
+
+        .question {
+            background: rgba(48, 0, 48, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #FF1493;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question p {
+            color: #FFB6C1;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .btn {
+            height: 55px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+            background: rgba(48, 0, 48, 0.8);
+            color: #FFB6C1;
+            box-shadow: 0 4px 8px rgba(255, 20, 147, 0.3);
+            border: 1px solid #FF1493;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 182, 193, 0.8);
+            opacity: 0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+            transition: 0s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(255, 20, 147, 0.4);
+            background: rgba(48, 0, 48, 0.9);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(255, 20, 147, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .correct-message {
+            background-color: rgba(76, 175, 80, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .incorrect-message {
+            background-color: rgba(244, 67, 54, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(48, 0, 48, 0.9);
+            color: #FFB6C1;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 0 15px #FF1493;
+            border: 1px solid #FF1493;
+        }
+
+        .btn.selected-correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn.selected-incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+
+        /* Score Card Styles */
+        .score-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .score-card.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .score-card-content {
+            width: 80%;
+            max-width: 600px;
+            background: rgba(48, 0, 48, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px #FF1493;
+            border: 2px solid #FF1493;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .score-title {
+            font-size: 2.5rem;
+            color: #FFB6C1;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #FF1493;
+        }
+
+        .score-result {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #FFB6C1;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #FF69B4;
+        }
+
+        .score-message {
+            font-size: 1.5rem;
+            color: #FFB6C1;
+            margin-bottom: 30px;
+        }
+
+        .score-progress {
+            height: 30px;
+            background: rgba(255, 20, 147, 0.3);
+            border-radius: 15px;
+            margin: 20px 0 30px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: linear-gradient(to right, #FF69B4, #FFB6C1);
+            border-radius: 15px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #FF1493;
+            color: #FFB6C1;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .restart-btn:hover {
+            background: #FF69B4;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .restart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f55;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="score-display">Score: <span id="score">0</span> / 20</div>
+    <div class="stars"></div>
+    <div class="quiz-container">
+        <h1>Movies and Media Quiz</h1>
+        <div id="quiz">
+            <div class="question">
+                <p>1. Who is known as the "Baadshah of Bollywood"?</p>
+                <div class="options">
+                    <button class="btn">Amitabh Bachchan</button>
+                    <button class="btn" data-correct="true">Shah Rukh Khan</button>
+                    <button class="btn">Salman Khan</button>
+                    <button class="btn">Aamir Khan</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. Which Indian film won the Oscar for Best Foreign Language Film?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Lagaan</button>
+                    <button class="btn">Mother India</button>
+                    <button class="btn">RRR</button>
+                    <button class="btn">Parasite</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. Who directed the movie "Sholay"?</p>
+                <div class="options">
+                    <button class="btn">Yash Chopra</button>
+                    <button class="btn" data-correct="true">Ramesh Sippy</button>
+                    <button class="btn">Manmohan Desai</button>
+                    <button class="btn">Raj Kapoor</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>4. Which actress won the first National Film Award for Best Actress?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Nargis</button>
+                    <button class="btn">Madhubala</button>
+                    <button class="btn">Mumtaz</button>
+                    <button class="btn">Waheeda Rehman</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>5. Who is known as the "Nightingale of Bollywood"?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Lata Mangeshkar</button>
+                    <button class="btn">Asha Bhosle</button>
+                    <button class="btn">Shreya Ghoshal</button>
+                    <button class="btn">Sunidhi Chauhan</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>6. Which was the first Indian film to be shot entirely in color?</p>
+                <div class="options">
+                    <button class="btn">Mother India</button>
+                    <button class="btn" data-correct="true">Mughal-e-Azam</button>
+                    <button class="btn">Sholay</button>
+                    <button class="btn">Guide</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>7. Who is called the "Khans of Bollywood"?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Salman, Shah Rukh, and Aamir</button>
+                    <button class="btn">Akshay, Ajay, and Govinda</button>
+                    <button class="btn">Hrithik, Tiger, and Ranveer</button>
+                    <button class="btn">Ranbir, Varun, and Arjun</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>8. Which Indian movie was the first to be nominated for the Oscars?</p>
+                <div class="options">
+                    <button class="btn">Lagaan</button>
+                    <button class="btn" data-correct="true">Mother India</button>
+                    <button class="btn">Salaam Bombay</button>
+                    <button class="btn">Rang De Basanti</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>9. Who composed the music for the movie "Lagaan"?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">A.R. Rahman</button>
+                    <button class="btn">Shankar-Ehsaan-Loy</button>
+                    <button class="btn">Pritam</button>
+                    <button class="btn">Ilaiyaraaja</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>10. Which actress has won the most Filmfare Awards?</p>
+                <div class="options">
+                    <button class="btn">Madhuri Dixit</button>
+                    <button class="btn">Deepika Padukone</button>
+                    <button class="btn" data-correct="true">Rekha</button>
+                    <button class="btn">Kajol</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>11. Who was the first superstar of Indian cinema?</p>
+                <div class="options">
+                    <button class="btn">Raj Kapoor</button>
+                    <button class="btn">Dilip Kumar</button>
+                    <button class="btn">Dev Anand</button>
+                    <button class="btn" data-correct="true">Rajesh Khanna</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>12. Which is the highest-grossing Indian film of all time?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Dangal</button>
+                    <button class="btn">Bahubali 2</button>
+                    <button class="btn">RRR</button>
+                    <button class="btn">PK</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>13. Who directed the movie "Dilwale Dulhania Le Jayenge"?</p>
+                <div class="options">
+                    <button class="btn">Karan Johar</button>
+                    <button class="btn" data-correct="true">Aditya Chopra</button>
+                    <button class="btn">Sanjay Leela Bhansali</button>
+                    <button class="btn">Yash Chopra</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>14. Which Indian actress has won a Miss World title?</p>
+                <div class="options">
+                    <button class="btn">Priyanka Chopra</button>
+                    <button class="btn" data-correct="true">Aishwarya Rai</button>
+                    <button class="btn">Deepika Padukone</button>
+                    <button class="btn">Sushmita Sen</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>15. Who is known as the "Melody Queen of India"?</p>
+                <div class="options">
+                    <button class="btn">Asha Bhosle</button>
+                    <button class="btn" data-correct="true">Lata Mangeshkar</button>
+                    <button class="btn">Sunidhi Chauhan</button>
+                    <button class="btn">Shreya Ghoshal</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>16. Which was the first Indian silent film?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Raja Harishchandra</button>
+                    <button class="btn">Alam Ara</button>
+                    <button class="btn">Kismet</button>
+                    <button class="btn">Shree 420</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>17. Who won the first Dadasaheb Phalke Award?</p>
+                <div class="options">
+                    <button class="btn">Raj Kapoor</button>
+                    <button class="btn" data-correct="true">Devika Rani</button>
+                    <button class="btn">Prithviraj Kapoor</button>
+                    <button class="btn">Dev Anand</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>18. Which Indian director is known for superhero movies?</p>
+                <div class="options">
+                    <button class="btn">S.S. Rajamouli</button>
+                    <button class="btn" data-correct="true">Rakesh Roshan</button>
+                    <button class="btn">Kabir Khan</button>
+                    <button class="btn">Anurag Kashyap</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>19. Who was the first Indian to win a Grammy Award?</p>
+                <div class="options">
+                    <button class="btn">A.R. Rahman</button>
+                    <button class="btn" data-correct="true">Ravi Shankar</button>
+                    <button class="btn">Zakir Hussain</button>
+                    <button class="btn">L. Subramaniam</button>
+                </div>
+            </div>
+            <div class="question">
+                <p>20. Which movie launched the careers of Shah Rukh Khan in Bollywood?</p>
+                <div class="options">
+                    <button class="btn">Dilwale Dulhania Le Jayenge</button>
+                    <button class="btn" data-correct="true">Deewana</button>
+                    <button class="btn">Darr</button>
+                    <button class="btn">Baazigar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Card -->
+    <div class="score-card" id="scoreCard">
+        <div class="score-card-content">
+            <h2 class="score-title">Quiz Completed!</h2>
+            <div class="score-result" id="finalScore">0/20</div>
+            <div class="score-message" id="scoreMessage">Let's see how you did...</div>
+            <div class="score-progress">
+                <div class="score-bar" id="scoreBar" style="width: 0%"></div>
+            </div>
+            <button class="restart-btn" id="restartBtn">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Star background generation
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numStars = 100;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${Math.random() * 2}px`;
+                star.style.height = star.style.width;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Quiz Interaction
+        let score = 0;
+        let answeredQuestions = 0;
+        const totalQuestions = 20;
+        const questions = document.querySelectorAll('.question');
+
+        // Check if the quiz is complete and show the score card
+        function checkQuizCompletion() {
+            if (answeredQuestions === totalQuestions) {
+                setTimeout(showScoreCard, 1000);
+            }
+        }
+
+        // Create confetti effect for score card
+        function createConfetti() {
+            const confettiContainer = document.querySelector('.score-card');
+            const colors = ['#FF1493', '#FF69B4', '#FFB6C1', '#FFC0CB', '#DB7093'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        // Show score card with final results
+        function showScoreCard() {
+            const scoreCard = document.getElementById('scoreCard');
+            const finalScore = document.getElementById('finalScore');
+            const scoreMessage = document.getElementById('scoreMessage');
+            const scoreBar = document.getElementById('scoreBar');
+            
+            finalScore.textContent = `${score}/${totalQuestions}`;
+            
+            // Calculate percentage
+            const percentage = (score / totalQuestions) * 100;
+            
+            // Set score bar width based on percentage
+            setTimeout(() => {
+                scoreBar.style.width = `${percentage}%`;
+            }, 500);
+            
+            // Set message based on score
+            if (percentage >= 90) {
+                scoreMessage.textContent = "Outstanding! You're a true Bollywood expert!";
+            } else if (percentage >= 75) {
+                scoreMessage.textContent = "Great job! You really know your Indian cinema!";
+            } else if (percentage >= 60) {
+                scoreMessage.textContent = "Good effort! You have solid knowledge about Bollywood.";
+            } else if (percentage >= 40) {
+                scoreMessage.textContent = "Not bad! You have some knowledge about Indian movies.";
+            } else {
+                scoreMessage.textContent = "Keep learning! There's more to discover about Bollywood.";
+            }
+            
+            // Show the score card
+            scoreCard.classList.add('show');
+            
+            // Add confetti effect for good scores
+            if (percentage >= 60) {
+                createConfetti();
+            }
+        }
+
+        // Quiz interaction
+        questions.forEach(question => {
+            const buttons = question.querySelectorAll('.btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Prevent interaction if already answered
+                    if (question.classList.contains('answered')) {
+                        return;
+                    }
+                    
+                    // Mark question as answered
+                    question.classList.add('answered');
+                    answeredQuestions++;
+                    
+                    // Disable further clicks on this question's buttons
+                    buttons.forEach(btn => btn.disabled = true);
+
+                    // Check if the selected answer is correct
+                    if (this.hasAttribute('data-correct')) {
+                        // Correct answer
+                        this.classList.add('selected-correct');
+                        score++;
+                        
+                        // Create and display correct message
+                        const correctMessage = document.createElement('div');
+                        correctMessage.classList.add('correct-message');
+                        correctMessage.textContent = "Correct! Well done! 🎉";
+                        question.appendChild(correctMessage);
+
+                        // Update score display
+                        document.getElementById('score').textContent = score;
+                    } else {
+                        // Incorrect answer
+                        this.classList.add('selected-incorrect');
+                        
+                        // Find and highlight the correct answer
+                        const correctButton = Array.from(buttons).find(btn => btn.hasAttribute('data-correct'));
+                        if (correctButton) {
+                            correctButton.classList.add('selected-correct');
+                        }
+
+                        // Create and display incorrect message
+                        const incorrectMessage = document.createElement('div');
+                        incorrectMessage.classList.add('incorrect-message');
+                        incorrectMessage.textContent = "Oops! That's not correct. 😕";
+                        question.appendChild(incorrectMessage);
+                    }
+                    
+                    // Check if the quiz is complete
+                    checkQuizCompletion();
+                });
+            });
+        });
+
+        // Restart the quiz
+        document.getElementById('restartBtn').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+</body>
+</html>

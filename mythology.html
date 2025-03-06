@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Mythology and Folklore Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #F5DEB3;  /* Warm wheat color */
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #8B0000;  /* Scarlet star color */
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        .quiz-container {
+            width: 700px;
+            background: rgba(245, 222, 179, 0.9);  /* Warm wheat background */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px #D2691E, 0 0 15px rgba(210, 105, 30, 0.5) inset;
+            border: 2px solid #D2691E;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(139, 0, 0, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #8B0000;  /* Scarlet text */
+            text-shadow: 0 0 10px #F5DEB3, 0 0 20px #D2691E;
+            position: relative;
+            letter-spacing: 2px;
+            animation: colorshift 6s linear infinite;
+        }
+
+        @keyframes colorshift {
+            0% { color: #550000; }
+            50% { color: #8B0000; }
+            100% { color: #550000; }
+        }
+
+        .question {
+            background: rgba(245, 222, 179, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #D2691E;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question p {
+            color: #8B0000;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .btn {
+            height: 55px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+            background: rgba(245, 222, 179, 0.8);
+            color: #8B0000;
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+            border: 1px solid #D2691E;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(139, 0, 0, 0.8);
+            opacity: 0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+            transition: 0s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(139, 0, 0, 0.4);
+            background: rgba(245, 222, 179, 0.9);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(139, 0, 0, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .correct-message {
+            background-color: rgba(76, 175, 80, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .incorrect-message {
+            background-color: rgba(244, 67, 54, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(245, 222, 179, 0.9);
+            color: #8B0000;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+            border: 1px solid #D2691E;
+        }
+
+        .btn.selected-correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn.selected-incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+
+        /* Score Card Styles */
+        .score-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .score-card.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .score-card-content {
+            width: 80%;
+            max-width: 600px;
+            background: rgba(245, 222, 179, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px #D2691E;
+            border: 2px solid #D2691E;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .score-title {
+            font-size: 2.5rem;
+            color: #8B0000;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #F5DEB3;
+        }
+
+        .score-result {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #8B0000;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #D2691E;
+        }
+
+        .score-message {
+            font-size: 1.5rem;
+            color: #8B0000;
+            margin-bottom: 30px;
+        }
+
+        .score-progress {
+            height: 30px;
+            background: rgba(210, 105, 30, 0.5);
+            border-radius: 15px;
+            margin: 20px 0 30px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: linear-gradient(to right, #D2691E, #8B0000);
+            border-radius: 15px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #D2691E;
+            color: #F5DEB3;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .restart-btn:hover {
+            background: #B22222;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .restart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f55;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="score-display">Score: <span id="score">0</span> / 20</div>
+    <div class="stars"></div>
+    <div class="quiz-container">
+        <h1>Mythology and Folklore in India Quiz</h1>
+        <div id="quiz">
+            <div class="question">
+                <p>1. Who is the main protagonist in the epic Ramayana?</p>
+                <div class="options">
+                    <button class="btn">Krishna</button>
+                    <button class="btn" data-correct="true">Rama</button>
+                    <button class="btn">Arjuna</button>
+                    <button class="btn">Hanuman</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. Which river is considered the most sacred in Hindu mythology?</p>
+                <div class="options">
+                    <button class="btn">Yamuna</button>
+                    <button class="btn" data-correct="true">Ganges</button>
+                    <button class="btn">Saraswati</button>
+                    <button class="btn">Godavari</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. Who is the monkey god known for his devotion to Rama?</p>
+                <div class="options">
+                    <button class="btn">Sugriva</button>
+                    <button class="btn" data-correct="true">Hanuman</button>
+                    <button class="btn">Bali</button>
+                    <button class="btn">Jambavan</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>4. In which state is the Theyyam ritual performance popular?</p>
+                <div class="options">
+                    <button class="btn">Tamil Nadu</button>
+                    <button class="btn" data-correct="true">Kerala</button>
+                    <button class="btn">Karnataka</button>
+                    <button class="btn">Andhra Pradesh</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>5. Who is the god of destruction in Hindu mythology?</p>
+                <div class="options">
+                    <button class="btn">Brahma</button>
+                    <button class="btn">Vishnu</button>
+                    <button class="btn" data-correct="true">Shiva</button>
+                    <button class="btn">Indra</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>6. Which epic describes the Kurukshetra War?</p>
+                <div class="options">
+                    <button class="btn">Ramayana</button>
+                    <button class="btn" data-correct="true">Mahabharata</button>
+                    <button class="btn">Puranas</button>
+                    <button class="btn">Vedas</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>7. Who is the creator god in Hindu mythology?</p>
+                <div class="options">
+                    <button class="btn">Vishnu</button>
+                    <button class="btn">Shiva</button>
+                    <button class="btn" data-correct="true">Brahma</button>
+                    <button class="btn">Krishna</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>8. Which folk dance is famous in Rajasthan?</p>
+                <div class="options">
+                    <button class="btn">Bharatanatyam</button>
+                    <button class="btn">Kathak</button>
+                    <button class="btn">Kuchipudi</button>
+                    <button class="btn" data-correct="true">Ghoomar</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>9. Who is the main antagonist in the Ramayana?</p>
+                <div class="options">
+                    <button class="btn">Duryodhana</button>
+                    <button class="btn" data-correct="true">Ravana</button>
+                    <button class="btn">Kansa</button>
+                    <button class="btn">Kamsa</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>10. Which legendary bird is a messenger in Indian mythology?</p>
+                <div class="options">
+                    <button class="btn">Eagle</button>
+                    <button class="btn">Peacock</button>
+                    <button class="btn" data-correct="true">Garuda</button>
+                    <button class="btn">Parrot</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>11. In which state is Chhau dance popular?</p>
+                <div class="options">
+                    <button class="btn">West Bengal</button>
+                    <button class="btn">Odisha</button>
+                    <button class="btn">Jharkhand</button>
+                    <button class="btn" data-correct="true">All of the above</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>12. Who is the wife of Lord Rama?</p>
+                <div class="options">
+                    <button class="btn">Draupadi</button>
+                    <button class="btn" data-correct="true">Sita</button>
+                    <button class="btn">Radha</button>
+                    <button class="btn">Parvati</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>13. Which river is associated with Lord Krishna?</p>
+                <div class="options">
+                    <button class="btn">Ganges</button>
+                    <button class="btn" data-correct="true">Yamuna</button>
+                    <button class="btn">Saraswati</button>
+                    <button class="btn">Godavari</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>14. Who wrote the Panchatantra?</p>
+                <div class="options">
+                    <button class="btn">Valmiki</button>
+                    <button class="btn">Vyasa</button>
+                    <button class="btn" data-correct="true">Vishnu Sharma</button>
+                    <button class="btn">Kalidasa</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>15. Which god is known as the remover of obstacles?</p>
+                <div class="options">
+                    <button class="btn">Shiva</button>
+                    <button class="btn">Vishnu</button>
+                    <button class="btn" data-correct="true">Ganesha</button>
+                    <button class="btn">Kartikeya</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>16. What is the traditional puppet theater of Rajasthan called?</p>
+                <div class="options">
+                    <button class="btn" data-correct="true">Kathputli</button>
+                    <button class="btn">Yakshagana</button>
+                    <button class="btn">Koodiyattam</button>
+                    <button class="btn">Tamasha</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>17. Who is the main antagonist in the Mahabharata?</p>
+                <div class="options">
+                    <button class="btn">Bhishma</button>
+                    <button class="btn">Ravana</button>
+                    <button class="btn" data-correct="true">Duryodhana</button>
+                    <button class="btn">Karna</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>18. Which classical dance form originated in Tamil Nadu?</p>
+                <div class="options">
+                    <button class="btn">Kathak</button>
+                    <button class="btn" data-correct="true">Bharatanatyam</button>
+                    <button class="btn">Kuchipudi</button>
+                    <button class="btn">Odissi</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>19. Who is the god of war in Hindu mythology?</p>
+                <div class="options">
+                    <button class="btn">Indra</button>
+                    <button class="btn" data-correct="true">Kartikeya</button>
+                    <button class="btn">Hanuman</button>
+                    <button class="btn">Shiva</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>20. Which epic describes the story of the Pandava brothers?</p>
+                <div class="options">
+                    <button class="btn">Ramayana</button>
+                    <button class="btn" data-correct="true">Mahabharata</button>
+                    <button class="btn">Puranas</button>
+                    <button class="btn">Vedas</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Card -->
+    <div class="score-card" id="scoreCard">
+        <div class="score-card-content">
+            <h2 class="score-title">Quiz Completed!</h2>
+            <div class="score-result" id="finalScore">0/20</div>
+            <div class="score-message" id="scoreMessage">Let's see how you did...</div>
+            <div class="score-progress">
+                <div class="score-bar" id="scoreBar" style="width: 0%"></div>
+            </div>
+            <button class="restart-btn" id="restartBtn">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Star background generation
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numStars = 100;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${Math.random() * 2}px`;
+                star.style.height = star.style.width;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Quiz Interaction
+        let score = 0;
+        let answeredQuestions = 0;
+        const totalQuestions = 20;
+        const questions = document.querySelectorAll('.question');
+
+        // Check if the quiz is complete and show the score card
+        function checkQuizCompletion() {
+            if (answeredQuestions === totalQuestions) {
+                setTimeout(showScoreCard, 1000);
+            }
+        }
+
+        // Create confetti effect for score card
+        function createConfetti() {
+            const confettiContainer = document.querySelector('.score-card');
+            const colors = ['#8B0000', '#D2691E', '#F5DEB3', '#FF4500', '#FFD700'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        // Show score card with final results
+        function showScoreCard() {
+            const scoreCard = document.getElementById('scoreCard');
+            const finalScore = document.getElementById('finalScore');
+            const scoreMessage = document.getElementById('scoreMessage');
+            const scoreBar = document.getElementById('scoreBar');
+            
+            finalScore.textContent = `${score}/${totalQuestions}`;
+            
+            // Calculate percentage
+            const percentage = (score / totalQuestions) * 100;
+            
+            // Set score bar width based on percentage
+            setTimeout(() => {
+                scoreBar.style.width = `${percentage}%`;
+            }, 500);
+            
+            // Set message based on score
+            if (percentage >= 90) {
+                scoreMessage.textContent = "Excellent! You're a mythology master!";
+            } else if (percentage >= 75) {
+                scoreMessage.textContent = "Great job! You know Indian mythology very well!";
+            } else if (percentage >= 60) {
+                scoreMessage.textContent = "Good effort! You have solid knowledge about Indian folklore.";
+            } else if (percentage >= 40) {
+                scoreMessage.textContent = "Not bad! You have some knowledge about Indian mythology.";
+            } else {
+                scoreMessage.textContent = "Keep learning! There's more to discover about Indian mythology.";
+            }
+            
+            // Show the score card
+            scoreCard.classList.add('show');
+            
+            // Add confetti effect for good scores
+            if (percentage >= 60) {
+                createConfetti();
+            }
+        }
+
+        // Quiz interaction
+        questions.forEach(question => {
+            const buttons = question.querySelectorAll('.btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Prevent interaction if already answered
+                    if (question.classList.contains('answered')) {
+                        return;
+                    }
+                    
+                    // Mark question as answered
+                    question.classList.add('answered');
+                    answeredQuestions++;
+                    
+                    // Disable further clicks on this question's buttons
+                    buttons.forEach(btn => btn.disabled = true);
+
+                    // Check if the selected answer is correct
+                    if (this.hasAttribute('data-correct')) {
+                        // Correct answer
+                        this.classList.add('selected-correct');
+                        score++;
+                        
+                        // Create and display correct message
+                        const correctMessage = document.createElement('div');
+                        correctMessage.classList.add('correct-message');
+                        correctMessage.textContent = "Correct! Well done! 🎉";
+                        question.appendChild(correctMessage);
+
+                        // Update score display
+                        document.getElementById('score').textContent = score;
+                    } else {
+                        // Incorrect answer
+                        this.classList.add('selected-incorrect');
+                        
+                        // Find and highlight the correct answer
+                        const correctButton = Array.from(buttons).find(btn => btn.hasAttribute('data-correct'));
+                        if (correctButton) {
+                            correctButton.classList.add('selected-correct');
+                        }
+
+                        // Create and display incorrect message
+                        const incorrectMessage = document.createElement('div');
+                        incorrectMessage.classList.add('incorrect-message');
+                        incorrectMessage.textContent = "Oops! That's not correct. 😕";
+                        question.appendChild(incorrectMessage);
+                    }
+                    
+                    // Check if the quiz is complete
+                    checkQuizCompletion();
+                });
+            });
+        });
+
+        // Restart the quiz
+        document.getElementById('restartBtn').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
